@@ -1,0 +1,19 @@
+{
+  "name": "veloop-rewards-giveaway",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-local.ps1",
+    "dev:app": "concurrently -k -n API,WEB -c yellow,cyan \"npm:dev --workspace backend\" \"npm:dev --workspace frontend\"",
+    "build": "npm run build --workspace frontend",
+    "start": "npm run start --workspace backend",
+    "test": "npm test --workspace backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
