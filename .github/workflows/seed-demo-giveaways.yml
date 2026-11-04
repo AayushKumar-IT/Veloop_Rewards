@@ -1,0 +1,53 @@
+name: One-time demo giveaway bootstrap
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: veloop-demo-giveaway-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  seed-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NODE_ENV: production
+      DEMO_MODE: "false"
+      ALLOW_DEMO_GIVEAWAY_SEED: "true"
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      CLAIM_ENCRYPTION_KEY: ${{ secrets.CLAIM_ENCRYPTION_KEY }}
+      DEVICE_HASH_SECRET: ${{ secrets.DEVICE_HASH_SECRET }}
+    steps:
+      - name: Check required secrets are configured
+        shell: bash
+        run: |
+          missing=0
+          for name in MONGO_URI JWT_SECRET CLAIM_ENCRYPTION_KEY DEVICE_HASH_SECRET; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing GitHub Actions secret: $name"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Insert demo giveaways only if the collection is empty
+        run: npm run seed:demo:production --workspace backend
