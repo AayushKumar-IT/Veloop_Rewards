@@ -7,6 +7,7 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "seed": "node src/seed.js",
+    "seed:demo:production": "node src/seedDemoProduction.js",
     "admin:setup": "node src/createAdmin.js",
     "test:integration": "node --test test/integration.test.js",
     "test": "node --test"
